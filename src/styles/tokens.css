@@ -1,0 +1,67 @@
+/*
+ * sbaby design tokens.
+ * Area colors come from the sbaby design system (sbaby_design_system.pdf).
+ * Everything marked "derived" is not in the PDF and was chosen to fit it.
+ * Rule: text never sits on a solid area color; use the -ink shade on the -tint.
+ */
+@import 'tailwindcss';
+
+@theme {
+  /* Development areas — sbaby design system */
+  --color-motor: #ec7a61;
+  --color-motor-tint: #fdf3f0;
+  --color-motor-ink: #a33b27;
+  --color-cognitive: #6fa8dc;
+  --color-cognitive-tint: #eef3fb;
+  --color-cognitive-ink: #2a5a8a;
+  --color-language: #f6bf55;
+  --color-language-tint: #fef8e7;
+  --color-language-ink: #7a5710;
+  --color-social: #6fb28c;
+  --color-social-tint: #eef6ee;
+  --color-social-ink: #2e6446;
+
+  /* Surfaces — cream from the design system, the rest derived */
+  --color-cream: #fffbf6;
+  --color-surface: #ffffff;
+  --color-line: #efe6dc;
+  --color-ink: #2b2622;
+  --color-ink-soft: #6b625a;
+
+  /* Primary action — derived: darker motor coral so white text passes WCAG AA (5.2:1) */
+  --color-primary: #b84a33;
+  --color-primary-pressed: #9c3d29;
+
+  /* Type — Poppins headings (matches the PDF), Nunito body (derived) */
+  --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Radius — cards ~24px and swatches ~12px as in the PDF */
+  --radius-card: 1.5rem;
+  --radius-swatch: 0.75rem;
+}
+
+@layer base {
+  html {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    margin: 0;
+    background: var(--color-cream);
+    min-height: 100dvh;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-cognitive);
+    outline-offset: 2px;
+  }
+}
