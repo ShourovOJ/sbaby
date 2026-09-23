@@ -25,10 +25,11 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
       },
     }),
   ],
+  build: { chunkSizeWarningLimit: 600 },
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts'],
