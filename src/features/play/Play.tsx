@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { useBaby, useGrowth, useToday } from '../../app/hooks'
 import { SuggestionCard } from '../../app/SuggestionCard'
 import { gameById } from '../../content/games'
@@ -241,10 +241,12 @@ export function Play() {
 
 function BackLink() {
   const navigate = useNavigate()
+  const location = useLocation()
   return (
     <button
       type="button"
-      onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate('/'))}
+      // "default" is the key of the first entry: nothing to go back to.
+      onClick={() => (location.key === 'default' ? navigate('/') : navigate(-1))}
       className="-ml-1 mb-3 inline-flex items-center gap-1 py-1 text-sm font-semibold text-ink-soft"
     >
       <Icon name="back" className="size-4" />

@@ -163,6 +163,42 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
   )
 }
 
+/**
+ * In-page confirmation. Native confirm() is unreliable (a claude.ai Artifact always returns false),
+ * so every "are you sure?" goes through this.
+ */
+export function ConfirmSheet({
+  open,
+  title,
+  message,
+  confirmLabel,
+  destructive,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean
+  title: string
+  message: ReactNode
+  confirmLabel: string
+  destructive?: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <Sheet open={open} onClose={onCancel} title={title}>
+      <div className="text-sm text-ink-soft">{message}</div>
+      <div className="mt-5 flex gap-2">
+        <Button className={cx('flex-1', destructive && 'bg-motor-ink active:bg-motor-ink')} onClick={onConfirm}>
+          {confirmLabel}
+        </Button>
+        <Button variant="secondary" className="flex-1" onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+    </Sheet>
+  )
+}
+
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="rounded-card border border-dashed border-line px-5 py-8 text-center">

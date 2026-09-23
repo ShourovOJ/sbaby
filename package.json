@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p . && vite build",
+    "build:artifact": "tsc -p . && vite build --mode artifact && node scripts/artifact-page.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -p .",
     "test": "vitest run",

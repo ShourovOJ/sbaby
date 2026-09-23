@@ -24,6 +24,14 @@ npm run test:e2e     # end-to-end tests (Playwright; builds and serves the app)
 
 If Playwright can't find a browser, set `PW_CHROMIUM_PATH` to a Chromium binary.
 
+### Deploy as a claude.ai Artifact
+
+```bash
+npm run build:artifact   # → dist-artifact/sbaby.html (one self-contained page)
+```
+
+This build has no service worker, keeps routes in memory, inlines fonts, and saves backups through the Artifact `downloads` capability. It is published with `capabilities: { downloads: true }`. Data stays in the viewer's browser (IndexedDB) for that artifact. `e2e/artifact.spec.ts` runs this exact page.
+
 ## Where things are
 
 | Path | What |

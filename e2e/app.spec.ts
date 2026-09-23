@@ -83,8 +83,8 @@ test('onboard, play, grow, review progress, back up and restore', async ({ page 
   const backupPath = await download.path()
   expect(JSON.parse(await readFile(backupPath, 'utf8')).logs).toHaveLength(3)
 
-  page.once('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Delete all data' }).click()
+  await page.getByRole('dialog', { name: 'Delete all data?' }).getByRole('button', { name: 'Delete everything' }).click()
   await expect(page).toHaveURL(/#\/welcome$/)
 
   await page.getByLabel('Backup file').setInputFiles(backupPath)

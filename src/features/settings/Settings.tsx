@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router'
 import { useBaby, useGamesPerDay } from '../../app/hooks'
 import { deleteAllData, saveBaby, setGamesPerDay } from '../../db/repo'
 import { todayISO } from '../../domain/age'
+import { saveFile } from '../../app/platform'
 import { MAX_GAMES_PER_DAY, MIN_GAMES_PER_DAY } from '../../domain/planner'
-import { Button, Card, SectionTitle, Stepper } from '../../ui/components'
+import { Button, Card, ConfirmSheet, SectionTitle, Stepper } from '../../ui/components'
 import { Icon } from '../../ui/Icon'
 import { BabyForm } from '../onboarding/BabyForm'
 
@@ -14,21 +15,24 @@ export function Settings() {
   const navigate = useNavigate()
   const fileRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [pendingRestore, setPendingRestore] = useState<File | null>(null)
+  const [confirmWipe, setConfirmWipe] = useState(false)
 
   async function download() {
     const { exportBackup } = await import('../../db/backup')
     const data = await exportBackup()
-    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `sbaby-backup-${todayISO()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    setMessage('Backup downloaded. Keep it somewhere safe, like Google Drive or email it to yourself.')
+    const outcome = await saveFile(`sbaby-backup-${todayISO()}.json`, JSON.stringify(data, null, 2))
+    setMessage(
+      outcome === 'saved'
+        ? 'Backup saved. Keep it somewhere safe, like Google Drive or email it to yourself.'
+        : outcome === 'declined'
+          ? 'Download cancelled. Nothing was saved.'
+          : 'Downloads aren’t available here. Open sbaby in a browser to save a backup.',
+    )
   }
 
   async function restore(file: File) {
-    if (!confirm('Restoring replaces everything on this device with the backup. Continue?')) return
+    setPendingRestore(null)
     try {
       const { importBackup } = await import('../../db/backup')
       await importBackup(JSON.parse(await file.text()))
@@ -40,7 +44,7 @@ export function Settings() {
   }
 
   async function wipe() {
-    if (!confirm(`Delete ${baby.name}’s profile and all games, notes and milestones from this device? This can’t be undone.`)) return
+    setConfirmWipe(false)
     await deleteAllData()
     navigate('/welcome', { replace: true })
   }
@@ -83,8 +87,8 @@ export function Settings() {
       <SectionTitle>Your data</SectionTitle>
       <Card>
         <p className="text-sm text-ink-soft">
-          Everything is stored only on this device. If you clear your browser data or lose your phone, it’s gone. Download a
-          backup now and then.
+          Everything is stored only in this browser on this device. If you clear your browser data or lose your phone,
+          it’s gone. Download a backup now and then.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button onClick={download}>Download backup</Button>
@@ -100,11 +104,11 @@ export function Settings() {
             onChange={(e) => {
               const f = e.target.files?.[0]
               e.target.value = ''
-              if (f) void restore(f)
+              if (f) setPendingRestore(f)
             }}
           />
         </div>
-        <Button variant="ghost" className="mt-4 -ml-3 text-motor-ink" onClick={wipe}>
+        <Button variant="ghost" className="mt-4 -ml-3 text-motor-ink" onClick={() => setConfirmWipe(true)}>
           Delete all data
         </Button>
       </Card>
@@ -120,6 +124,25 @@ export function Settings() {
           If you’re worried about your baby’s development, talk to your doctor.
         </p>
       </div>
+
+      <ConfirmSheet
+        open={!!pendingRestore}
+        title="Restore this backup?"
+        message="Restoring replaces everything in sbaby on this device with the backup."
+        confirmLabel="Restore"
+        destructive
+        onConfirm={() => pendingRestore && void restore(pendingRestore)}
+        onCancel={() => setPendingRestore(null)}
+      />
+      <ConfirmSheet
+        open={confirmWipe}
+        title="Delete all data?"
+        message={`This deletes ${baby.name}’s profile and all games, notes and milestones from this device. It can’t be undone.`}
+        confirmLabel="Delete everything"
+        destructive
+        onConfirm={() => void wipe()}
+        onCancel={() => setConfirmWipe(false)}
+      />
     </main>
   )
 }
